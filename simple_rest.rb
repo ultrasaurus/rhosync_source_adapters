@@ -23,18 +23,14 @@ class SimpleRest < SourceAdapter
     response = Net::HTTP.start(uri.host,uri.port) do |http|
       http.request(req)
     end
-    p "calling nokogiri"
-    p response.body
     @result = Nokogiri::XML(response.body)
   end
  
   def sync
     puts "=========================================== sync "
-    puts @result.inspect
     generic_results = {}
     # @result={"1"=>{"title"=>"Awesome Stuff"},"2"=>{"title"=>"Just One More Thing"}}
     @result.xpath('./projects/project').each do |project|
-      puts "project: #{project.inspect}"
       result = {}
       id = project.xpath("./id/text()").to_s
       title = project.xpath("./title/text()").to_s
@@ -42,8 +38,6 @@ class SimpleRest < SourceAdapter
       result['title'] = title;
       generic_results[id] = result;
     end
-    puts "----------- result"
-    puts generic_results.inspect
     @result = generic_results
     super
   end
@@ -69,11 +63,7 @@ class SimpleRest < SourceAdapter
       response = Net::HTTP.start(uri.host,uri.port) do |http|
         http.request(req)
       end
-
-      p "----------- response"
-      p "response code: #{response.code}"
-      p "response message: #{response.message}"
-      p response.body
+      p "response: #{response.code}: #{response.message}"
     end
   end
  
