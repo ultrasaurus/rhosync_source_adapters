@@ -1,0 +1,7 @@
+sugar*
+authenticated_system.rb
+authenticated_test_helper.rb
+rest_api_helpers.rb
+source_adapter.rb
+wikipedia.rb
+tasks/
