@@ -49,15 +49,36 @@ class SimpleRest < SourceAdapter
   end
  
   def create(name_value_list)
-    puts "=========================================== create "
+    puts "=========================================== create: #{name_value_list.inspect} "
+    uri = URI.parse(@source.url+"/projects.xml")
 
-    #TODO: write some code here
-    # the backend application will provide the object hash key and corresponding value
-    raise "Please provide some code to create a single object in the backend application using the hash values in name_value_list"
+    name_value_list.each do |item|
+      puts "item: #{item.inspect}"
+      builder = Nokogiri::XML::Builder.new
+      builder.project do
+          builder.title item["value"]
+        end
+      puts "------ XML for item"
+      puts builder.to_xml
+
+      req = Net::HTTP::Post.new(uri.path)
+      req['Accept'] = "application/xml"
+      req['Content-Type'] = "application/xml"
+      #req.basic_auth @source.login, @source.password
+      req.body=builder.to_xml
+      response = Net::HTTP.start(uri.host,uri.port) do |http|
+        http.request(req)
+      end
+
+      p "----------- response"
+      p "response code: #{response.code}"
+      p "response message: #{response.message}"
+      p response.body
+    end
   end
  
   def update(name_value_list)
-    puts "=========================================== update "
+    puts "=========================================== update #{name_value_list.inspect} "
 
     #TODO: write some code here
     # be sure to have a hash key and value for "object"
@@ -65,7 +86,7 @@ class SimpleRest < SourceAdapter
   end
  
   def delete(name_value_list)
-    puts "=========================================== delete "
+    puts "=========================================== delete #{name_value_list.inspect} "
 
     #TODO: write some code here if applicable
     # be sure to have a hash key and value for "object"
