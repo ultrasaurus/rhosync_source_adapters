@@ -23,15 +23,15 @@ class SimpleRest < SourceAdapter
     response = Net::HTTP.start(uri.host,uri.port) do |http|
       http.request(req)
     end
-    xml_data = XmlSimple.xml_in(response.body);
-    @result = xml_data["project"]
-    puts "-------- result ------------"
-    puts @result.inspect
-    @result
+    p "calling nokogiri"
+    p response.body
+    @result = Nokogiri::XML(response.body)
   end
  
   def sync
     puts "=========================================== sync "
+    puts @result.inspect
+
   end
  
   def create(name_value_list)
