@@ -31,7 +31,21 @@ class SimpleRest < SourceAdapter
   def sync
     puts "=========================================== sync "
     puts @result.inspect
-
+    generic_results = {}
+    # @result={"1"=>{"title"=>"Awesome Stuff"},"2"=>{"title"=>"Just One More Thing"}}
+    @result.xpath('./projects/project').each do |project|
+      puts "project: #{project.inspect}"
+      result = {}
+      id = project.xpath("./id/text()").to_s
+      title = project.xpath("./title/text()").to_s
+      puts "id: #{id}  title: #{title}"
+      result['title'] = title;
+      generic_results[id] = result;
+    end
+    puts "----------- result"
+    puts generic_results.inspect
+    @result = generic_results
+    super
   end
  
   def create(name_value_list)
