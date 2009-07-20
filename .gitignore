@@ -5,3 +5,4 @@ rest_api_helpers.rb
 source_adapter.rb
 wikipedia.rb
 tasks/
+product.rb
