@@ -9,20 +9,65 @@ describe 'ProductShop' do
     @inventory = ProductShop::Inventory.new()
   end
 
-  it 'should provide a list of products' do
-    FakeWeb.register_uri(:get, "http://www.pivotaltracker.com/services/v2/projects",
+  it 'should provide a list of categories' do
+    FakeWeb.register_uri(:get, "http://productshop.heroku.com/categories.xml",
                          :body => <<-EOS
-[{"product": {"name": "wheel", "brand": "Acme", "updated_at": "2009-07-23T18:08:12Z", "price": "$30.00", "quantity": "52", "id": 1, "sku": "100", "created_at": "2009-07-23T18:08:12Z"}},
- {"product": {"name": "axle", "brand": "Acme", "updated_at": "2009-07-23T18:09:09Z", "price": "$104", "quantity": "30", "id": 2, "sku": "101", "created_at": "2009-07-23T18:09:09Z"}},
- {"product": {"name": "Hovercraft", "brand": "Ford", "updated_at": "2009-07-23T18:09:34Z", "price": "$30,000", "quantity": "1", "id": 3, "sku": "900", "created_at": "2009-07-23T18:09:34Z"}}]
-
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+  <category>
+    <name>One</name>
+    <id>1</id>
+  </category>
+  <category>
+    <name>Two</name>
+    <id>2</id>
+  </category>
+  <category>
+    <name>Five</name>
+    <id>5</id>
+  </category>
+</categories>
     EOS
 )
 
-    plist = @inventory.products
-    plist.length.should == 3
-    wheel = plist["1"]
+    clist = @inventory.categories
+    clist.length.should == 3
+    c = clist["1"]
+    c['name'].should == "One"
+    c = clist["5"]
+    c['name'].should == "Five"
+
+  end
+  
+  it 'should provide a list of products for a category' do
+    FakeWeb.register_uri(:get, "http://productshop.heroku.com/categories/1.xml",
+                         :body => <<-EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<category name="Parts">
+  <product>
+    <sku>100</sku>
+    <name>wheel</name>
+    <brand>Acme</brand>
+    <price>$30.00</price>
+    <quantity>52</quantity>
+  </product>
+  <product>
+    <sku>101</sku>
+    <name>axle</name>
+    <brand>Acme</brand>
+    <price>$104</price>
+    <quantity>30</quantity>
+
+  </product>
+</category>
+    EOS
+)
+
+    plist = @inventory.products(1)
+    plist.length.should == 2
+    wheel = plist["100"]
     wheel['name'].should == "wheel"
     wheel['brand'].should == "Acme"
+    wheel['price'].should == "$30.00"
   end
 end

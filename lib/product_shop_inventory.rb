@@ -1,26 +1,40 @@
 require "open-uri"
 require "json"
+require "nokogiri"
 
 module ProductShop
 
   class Inventory
 
-    def products
-      product_hashes = nil
-      open("http://productshop.heroku.com/products.json") do |f|
-        # get an array of products, each is a hash with its value another hash of the product attributes
-        # {"product"=>{"brand"=>"Michelin", "name"=>"inner tube", ...}}
-        product_hashes=JSON.parse(f.read)
+    def categories
+      xml = nil
+      result = {}
+      open("http://productshop.heroku.com/categories.xml") do |f|
+        xml = Nokogiri::XML(f.read)
       end
-      @result={}
-      if !product_hashes.empty?
-        product_hashes.each do |item|
-           attrs = item["product"]
-           id = attrs["id"].to_s  # note: id must be a string
-           @result[id]=attrs
+      xml.xpath('./categories/category').each do |product_node|
+        id = product_node.xpath("./id/text()").to_s
+        name = product_node.xpath("./name/text()").to_s
+        result[id] = {'name' => name} 
+      end
+      result
+    end
+
+    def products(category_id)
+      xml = nil
+      result = {}
+      open("http://productshop.heroku.com/categories/#{category_id}.xml") do |f|
+        xml = Nokogiri::XML(f.read)
+      end
+      xml.xpath('./category/product').each do |product_node|
+        id = product_node.xpath("./sku/text()").to_s
+        attr_hash = {}
+        product_node.children.each do |attr_node|
+          attr_hash[attr_node.name] = attr_node.text
         end
+        result[id] = attr_hash
       end
-      @result
+      result
 
     end
 
