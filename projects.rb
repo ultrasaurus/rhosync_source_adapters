@@ -1,7 +1,3 @@
-require 'rubygems'
-require 'nokogiri'
-require 'net/http'
-require 'uri'
 require 'lib/pivotal_tracker'
 
 class Projects < SourceAdapter
@@ -16,46 +12,12 @@ class Projects < SourceAdapter
 
   def login
     puts "=========================================== login "
-    puts "@source=#{@source.inspect}"
-    puts "@login=#{@login.inspect}"
-    puts "@password=#{@password.inspect}"
     @account = PivotalTracker::Account.new(@login, @password)
   end
  
   def query
     puts "=========================================== query "
-    puts "@token=#{@token}"
-    begin
-      generic_results = {}
-
-      uri = URI.parse("http://www.pivotaltracker.com/services/v2/projects")
-      http = Net::HTTP.new(uri.host)
-      req = Net::HTTP::Get.new(uri.path, {'Accept' => 'application/xml', 'X-TrackerToken' => @token})
-      response = http.request(req)
-      puts response.inspect
-
-      case response
-      when Net::HTTPSuccess, Net::HTTPRedirection
-        # OK
-        puts response.body
-        xml = Nokogiri::XML(response.body)
-        xml.xpath('./projects/project').each do |project|
-          result = {}
-          id = project.xpath("./id/text()").to_s
-          result['name'] = project.xpath("./name/text()").to_s
-          generic_results[id] = result;
-        end
-      else
-        response.error!
-      end
-
-    rescue
-      puts "*** ERROR ***"
-      $stderr.puts $!
-      raise "query failed"
-    end
-    puts generic_results.inspect
-    @result = generic_results
+    @result = @account.projects
   end
  
   def sync
