@@ -12,7 +12,7 @@ class Products < SourceAdapter
   def query
     puts "=========================================== Products query "
     @result = {}
-    puts "qparams=#{qparams}"
+    puts "qparms=#{qparms.inspect}"
     begin
       @result = @inventory.products(1)
       puts @result.inspect
