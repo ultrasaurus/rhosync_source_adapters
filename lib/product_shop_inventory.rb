@@ -20,22 +20,35 @@ module ProductShop
       result
     end
 
-    def products(category_id)
+    def products(category_id = nil)
       xml = nil
       result = {}
-      open("http://productshop.heroku.com/categories/#{category_id}.xml") do |f|
-        xml = Nokogiri::XML(f.read)
-      end
-      xml.xpath('./category/product').each do |product_node|
-        id = product_node.xpath("./sku/text()").to_s
-        attr_hash = {}
-        product_node.children.each do |attr_node|
-          attr_hash[attr_node.name] = attr_node.text
+      if (category_id.nil?)
+        open("http://productshop.heroku.com/products.xml") do |f|
+          xml = Nokogiri::XML(f.read)
         end
-        result[id] = attr_hash
+        xml.xpath('./products/product').each do |product_node|
+          id = product_node.xpath("./sku/text()").to_s
+          attr_hash = {}
+          product_node.children.each do |attr_node|
+            attr_hash[attr_node.name] = attr_node.text
+          end
+          result[id] = attr_hash
+        end
+      else
+        open("http://productshop.heroku.com/categories/#{category_id}.xml") do |f|
+          xml = Nokogiri::XML(f.read)
+        end
+        xml.xpath('./category/product').each do |product_node|
+          id = product_node.xpath("./sku/text()").to_s
+          attr_hash = {}
+          product_node.children.each do |attr_node|
+            attr_hash[attr_node.name] = attr_node.text
+          end
+          result[id] = attr_hash
+        end
       end
       result
-
     end
 
   end

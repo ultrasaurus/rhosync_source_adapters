@@ -12,9 +12,9 @@ class Products < SourceAdapter
   def query
     puts "=========================================== Products query "
     @result = {}
-    puts "qparms=#{qparms.inspect}"
+    #puts "qparms=#{qparms.inspect}"
     begin
-      @result = @inventory.products(1)
+      @result = @inventory.products
       puts @result.inspect
     rescue
       puts "*** ERROR ***"

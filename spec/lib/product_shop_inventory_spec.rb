@@ -70,4 +70,42 @@ describe 'ProductShop' do
     wheel['brand'].should == "Acme"
     wheel['price'].should == "$30.00"
   end
+  it 'should provide a list of all products when no category_id is given' do
+    FakeWeb.register_uri(:get, "http://productshop.heroku.com/products.xml",
+                         :body => <<-EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product>
+    <sku>100</sku>
+    <name>wheel</name>
+    <brand>Acme</brand>
+    <price>$30.00</price>
+    <quantity>52</quantity>
+    <category_id>2</category_id>
+  </product>
+  <product>
+    <sku>900</sku>
+    <name>Hovercraft</name>
+    <brand>Ford</brand>
+    <price>$100,000</price>
+    <quantity>3</quantity>
+    <category_id>1</category_id>
+  </product>
+</products>
+    EOS
+)
+
+    plist = @inventory.products
+    plist.length.should == 2
+    item = plist["100"]
+    item['name'].should == "wheel"
+    item['brand'].should == "Acme"
+    item['price'].should == "$30.00"
+    item['category_id'].should == "2"
+    item = plist["900"]
+    item['name'].should == "Hovercraft"
+    item['brand'].should == "Ford"
+    item['price'].should == "$100,000"
+    item['category_id'].should == "1"
+  end
 end
