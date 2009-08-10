@@ -1,40 +1,19 @@
-require "open-uri"
-require "nokogiri"
-
-class Linklist < SourceAdapter
+class Images < SourceAdapter
   def initialize(source,credential)
     super(source,credential)
   end
  
   def login
+
   end
  
   def query
-    puts "===================================== query"
-    begin
-    xml = nil
-    result = {}
-    open("http://gentle-mountain-31.heroku.com/images.xml") do |f|
-      xml = Nokogiri::XML(f.read)
-    end
-    xml.xpath('./images/image').each do |image_node|
-      id = image_node.xpath("./id/text()").to_s
-      link = image_node.xpath("./link/text()").to_s
-      img_url = image_node.xpath("./img_url/text()").to_s
-      title = image_node.xpath("./title/text()").to_s
-      result[id] = {'link' => link, 'title' => title, 'img_url' => img_url} 
-    end
-    rescue
-        puts "*** ERROR ***"
-        $stderr.puts $!
-        raise "query failed"    
-    end  
-    puts "result=#{result.inspect}"
-    @result = result
+
   end
  
   def sync
-
+    # TODO: write code here that converts the data you got back from query into an @result object
+    # where @result is an array of hashes,  each array item representing an object
     super # this creates object value triples from an @result variable that contains an array of hashes
   end
  
