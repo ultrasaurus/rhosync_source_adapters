@@ -9,11 +9,7 @@ class Product < SourceAdapter
   end
  
   def query
-    puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&QUERY&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-
-
     @result = ProductResource.hashinate_all
-    puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&END QUERY&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"     
     @result
   end
  
